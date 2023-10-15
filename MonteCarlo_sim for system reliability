@@ -1,0 +1,93 @@
+'''
+Author: WuChaokang
+Date:2023.10.13
+Purpose:Monte Carlo simulation for system reliability in 4 conditions
+* The 4 components' life are exponential distribution
+** series
+** parallel
+** out of gate
+** cold standby with perfect switch
+'''
+import numpy as np
+import matplotlib.pyplot as plt
+
+def myplot(sample):
+    plt.hist(sample, bins=300, density=True, alpha=0.7, edgecolor='black',color='blue')
+    plt.show()
+    plt.show()
+
+def series(sample1,sample2,sample3,sample4,test_num):
+    sample_system=np.zeros(test_num)
+    for i in range(test_num):
+        sample_system[i]=min(sample1[i],sample2[i],sample3[i],sample4[i])
+    sample_system=np.sort(sample_system)
+    ri=np.zeros(test_num)
+    for i in range(test_num):
+        ri[i]=(test_num-i)/test_num
+
+    plt.plot(sample_system,ri)
+    plt.grid(True)
+    plt.show()
+    return ri,sample_system
+
+
+def parallel(sample1,sample2,sample3,sample4,test_num):
+    sample_system=np.zeros(test_num)
+    for i in range(test_num):
+        sample_system[i]=max(sample1[i],sample2[i],sample3[i],sample4[i])
+    sample_system=np.sort(sample_system)
+    ri=np.zeros(test_num)
+    for i in range(test_num):
+        ri[i]=(test_num-i)/test_num
+
+    plt.plot(sample_system,ri)
+    plt.grid(True)
+    plt.show()
+    return ri,sample_system
+
+
+def Out_of_Gate(n,m,sample1,sample2,sample3,sample4,test_num):
+    sample_system=np.zeros(test_num)
+    for i in range(test_num):
+        sample_system[i]=sorted([sample1[i],sample2[i],sample3[i],sample4[i]])[m-n]
+    sample_system=np.sort(sample_system)
+    ri=np.zeros(test_num)
+    for i in range(test_num):
+        ri[i]=(test_num-i)/test_num
+
+    plt.plot(sample_system,ri)
+    plt.grid(True)
+    plt.show()
+    return ri,sample_system
+
+
+def cold_standby_perfect_switch(sample1,sample2,sample3,sample4,test_num):
+
+    sample_system=sample1+sample2+sample3+sample4
+    sample_system=np.sort(sample_system)
+    ri=np.zeros(test_num)
+    for i in range(test_num):
+        ri[i]=(test_num-i)/test_num
+
+    plt.plot(sample_system,ri)
+    plt.grid(True)
+    plt.show()
+    return ri,sample_system
+
+def main():
+    T1,T2,T3,T4=1000,2000,1500,2500 #Mean life
+    #std_dev1,std_dev2,std_dev3,std_dev4=10,15,8,19
+    test_num=1000   ##改变测试次数得到更好的效果，但请注意效率
+    sample1=np.random.exponential(T1,test_num)   #各部件寿命样本1，2，3，4
+    sample2=np.random.exponential(T2,test_num)
+    sample3=np.random.exponential(T3,test_num)
+    sample4=np.random.exponential(T4,test_num)
+    print(sample1)
+    #Generate the reliability data
+    Out_of_Gate(2,4,sample1,sample2,sample3,sample4,test_num)
+    #series(sample1,sample2,sample3,sample4,test_num)
+    #series(sample1,sample2,sample3,sample4,test_num)
+    #
+
+
+main()
